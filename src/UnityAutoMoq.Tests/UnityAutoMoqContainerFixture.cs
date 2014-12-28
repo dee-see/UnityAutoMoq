@@ -148,12 +148,20 @@ namespace UnityAutoMoq.Tests
         }
 
         [Test]
-        public void Can_mock_abstract_classes_without_parameterless_constructor()
+        public void Can_get_abstract_class_without_parameterless_constructor_without_registering_it_first()
         {
-            var real = container.Resolve<AbstractService>();
-            var mock = container.GetMock<AbstractService>();
+            var mocked = container.Resolve<AbstractService>();
 
-            real.ShouldBeSameAs(mock.Object);
+            mocked.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void Can_resolve_concrete_type_with_abstract_dependency_that_does_not_have_a_parameterless_constructor()
+        {
+            var mocked = container.Resolve<YetAnotherService>();
+
+            mocked.ShouldNotBeNull();
+            mocked.AbstractService.ShouldNotBeNull();
         }
     }
 }

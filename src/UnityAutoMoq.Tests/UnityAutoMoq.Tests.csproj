@@ -103,6 +103,7 @@
     <Compile Include="Service.cs" />
     <Compile Include="ServiceWithAbstractDependency.cs" />
     <Compile Include="UnityAutoMoqContainerFixture.cs" />
+    <Compile Include="YetAnotherService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\UnityAutoMoq\UnityAutoMoq.csproj">
