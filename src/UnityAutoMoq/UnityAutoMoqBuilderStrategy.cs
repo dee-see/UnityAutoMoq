@@ -24,7 +24,7 @@ namespace UnityAutoMoq
 
             if (autoMoqContainer.Registrations.Any(r => r.RegisteredType == type))
                 return;
-            
+
             if (type.IsInterface || type.IsAbstract)
             {
                 context.Existing = GetOrCreateMock(type);
@@ -39,10 +39,12 @@ namespace UnityAutoMoq
 
             Type genericType = typeof(Mock<>).MakeGenericType(new[] { t });
 
-            object mock = Activator.CreateInstance(genericType);
+            var constructor = t.GetConstructors().OrderByDescending(c => c.GetParameters().Length).FirstOrDefault(); // Constructor with most arguments to follow Unity convention
+            object[] arguments = constructor == null ? new object[0] : constructor.GetParameters().Select(x => autoMoqContainer.Resolve(x.ParameterType, null)).ToArray();
+            object mock = Activator.CreateInstance(genericType, arguments);
 
             AsExpression interfaceImplementations = autoMoqContainer.GetInterfaceImplementations(t);
-            if(interfaceImplementations != null)
+            if (interfaceImplementations != null)
                 interfaceImplementations.GetImplementations().Each(type => genericType.GetMethod("As").MakeGenericMethod(type).Invoke(mock, null));
 
             genericType.InvokeMember("DefaultValue", BindingFlags.SetProperty, null, mock, new object[] { autoMoqContainer.DefaultValue });

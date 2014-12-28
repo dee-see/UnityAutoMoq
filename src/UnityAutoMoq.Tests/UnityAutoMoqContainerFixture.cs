@@ -146,5 +146,14 @@ namespace UnityAutoMoq.Tests
 
             real.ShouldBeOfType<AnotherService>();
         }
+
+        [Test]
+        public void Can_mock_abstract_classes_without_parameterless_constructor()
+        {
+            var real = container.Resolve<AbstractService>();
+            var mock = container.GetMock<AbstractService>();
+
+            real.ShouldBeSameAs(mock.Object);
+        }
     }
 }
