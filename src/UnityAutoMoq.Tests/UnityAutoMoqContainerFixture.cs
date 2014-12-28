@@ -72,7 +72,7 @@ namespace UnityAutoMoq.Tests
         [Test]
         public void Should_apply_specified_default_value_when_specified_2()
         {
-            container = new UnityAutoMoqContainer{DefaultValue = DefaultValue.Empty};
+            container = new UnityAutoMoqContainer { DefaultValue = DefaultValue.Empty };
             var mocked = container.GetMock<IService>();
 
             mocked.DefaultValue.ShouldEqual(DefaultValue.Empty);
@@ -162,6 +162,14 @@ namespace UnityAutoMoq.Tests
 
             mocked.ShouldNotBeNull();
             mocked.AbstractService.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void Abstract_class_with_ambiguous_constructor_throws_exception()
+        {
+            typeof(ResolutionFailedException).ShouldBeThrownBy(
+                () => container.Resolve<AbstractServiceWithAmbiguousConstructor>(), 
+                e => e.InnerException is InvalidOperationException);
         }
     }
 }

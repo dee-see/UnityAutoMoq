@@ -39,9 +39,7 @@ namespace UnityAutoMoq
 
             Type genericType = typeof(Mock<>).MakeGenericType(new[] { t });
 
-            var constructor = t.GetConstructors().OrderByDescending(c => c.GetParameters().Length).FirstOrDefault(); // Constructor with most arguments to follow Unity convention
-            object[] arguments = constructor == null ? new object[0] : constructor.GetParameters().Select(x => autoMoqContainer.Resolve(x.ParameterType, null)).ToArray();
-            object mock = Activator.CreateInstance(genericType, arguments);
+            object mock = Activator.CreateInstance(genericType, GetConstructorArguments(t));
 
             AsExpression interfaceImplementations = autoMoqContainer.GetInterfaceImplementations(t);
             if (interfaceImplementations != null)
@@ -53,6 +51,29 @@ namespace UnityAutoMoq
             mocks.Add(t, mockedInstance);
 
             return mockedInstance;
+        }
+
+        /// <summary>
+        /// Get the arguments for the constructor with the most parameters following Unity convention.
+        /// </summary>
+        /// <exception cref="System.InvalidOperationException">
+        /// There are more than one constructors with the same (max) amount of parameters. Unity throws the same exception where resolving a concrete type.
+        /// </exception>
+        private object[] GetConstructorArguments(Type t)
+        {
+            var constructors = (from c in t.GetConstructors()
+                                let numberOfParameters = c.GetParameters().Length
+                                group c by numberOfParameters into x
+                                orderby x.Key descending
+                                select x).ToList();
+
+            if (constructors.Count == 0)
+                return new object[0];
+            if (constructors[0].Count() > 1)
+                throw new InvalidOperationException(string.Format("The type {0} has multiple constructor of length {1}. Unable to disambiguate.", t.Name, constructors[0].Key));
+
+            // Constructor with most arguments to follow Unity convention
+            return constructors[0].First().GetParameters().Select(x => autoMoqContainer.Resolve(x.ParameterType, null)).ToArray();
         }
     }
 }

@@ -94,6 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AbstractService.cs" />
+    <Compile Include="AbstractServiceWithAmbiguousConstructor.cs" />
     <Compile Include="AnotherService.cs" />
     <Compile Include="CoreTdd.cs" />
     <Compile Include="IAnotherService.cs" />
