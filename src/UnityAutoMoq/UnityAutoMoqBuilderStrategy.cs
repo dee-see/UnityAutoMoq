@@ -65,15 +65,15 @@ namespace UnityAutoMoq
                                 let numberOfParameters = c.GetParameters().Length
                                 group c by numberOfParameters into x
                                 orderby x.Key descending
-                                select x).ToList();
+                                select x).FirstOrDefault();
 
-            if (constructors.Count == 0)
+            if (constructors == null)
                 return new object[0];
-            if (constructors[0].Count() > 1)
-                throw new InvalidOperationException(string.Format("The type {0} has multiple constructor of length {1}. Unable to disambiguate.", t.Name, constructors[0].Key));
+            if (constructors.Count() > 1)
+                throw new InvalidOperationException(string.Format("The type {0} has multiple constructor of length {1}. Unable to disambiguate.", t.Name, constructors.Key));
 
             // Constructor with most arguments to follow Unity convention
-            return constructors[0].First().GetParameters().Select(x => autoMoqContainer.Resolve(x.ParameterType, null)).ToArray();
+            return constructors.First().GetParameters().Select(x => autoMoqContainer.Resolve(x.ParameterType, null)).ToArray();
         }
     }
 }
